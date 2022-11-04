@@ -1,10 +1,11 @@
 #include "bin.h"
-
+#include <iostream>
 
 Bin::Bin()
 {
 	binId = 0;
 	depth = 0;
+	currentSize = 0;
 
 	binContents = new game[depth];
 }
@@ -13,6 +14,7 @@ Bin::Bin(int id, int d)
 {
 	binId = id;
 	depth = d;
+	currentSize = 0;
 
 	binContents = new game[depth];
 }
@@ -27,6 +29,11 @@ int Bin::getDepth()
 	return depth;
 }
 
+int Bin::getCurrentSize()
+{
+	return currentSize;
+}
+
 bool Bin::gameExists(string n)
 {
 	for (int i = 0; i < depth; i++)
@@ -38,6 +45,11 @@ bool Bin::gameExists(string n)
 	}
 
 	return false;
+}
+
+bool Bin::isFull()
+{
+	return currentSize == depth;
 }
 
 game* Bin::getGame(string n)
@@ -55,4 +67,35 @@ game* Bin::getGame(string n)
 game* Bin::getGame(int i)
 {
 	return &binContents[i];
+}
+
+game* Bin::getTopGame()
+{
+	return &binContents[binStack.top()];
+}
+
+
+void Bin::pushGame(game newGame)
+{
+	if (currentSize < depth)
+	{
+		binStack.push(currentSize);
+		binContents[currentSize] = newGame;
+
+		currentSize++;
+	}
+}
+
+
+game* Bin::popGame()
+{
+	int index = binStack.top();
+	game newGame = binContents[index];
+
+	binStack.pop();
+	binContents[index] = game();
+
+	currentSize--;
+
+	return &newGame;
 }

@@ -51,11 +51,11 @@ void timeRemainingToTimeOfDay(double, int&, int&);
 customerChoices makeCustomerChoice(Bin[], int, string);
 bool gameInStock(Bin[], int, string);
 string rarityText(gameRarity);
-void sellGame(Bin[], int, game&, double&, double&); //NEEDS TO BE FINISHED
-void buyGame(Bin[], int, game&, double&, double&); //NEEDS TO BE FINISHED
-void noDeal(string, string, double&);
+void sellGame(Bin[], int, game&, double&, double&);
+void buyGame(Bin[], int, game&, double&, double&);
+void noDeal(Bin[], int, string, string, double&);
 void displayEndOfDayReport(); //NEEDS TO BE WRITTEN
-void displayGameOverReport(); //NEEDS TO BE WRITTEN
+void displayGameOverReport(int, double);
 void updateHighScores(int); //NEEDS TO BE WRITTEN
 void displayBins(Bin[], int);
 
@@ -104,7 +104,11 @@ int main()
 }
 
 /**
-
+Task: Display a Menu to allow the user to navigate the program
+Input: None
+Output: The choice selected as an enum
+Preconditions: None
+Postconditions: The choice selected is of type titleMenuChoices
 **/
 titleMenuChoices titleScreen()
 {
@@ -155,7 +159,11 @@ titleMenuChoices titleScreen()
 }
 
 /**
-
+Task: Display How to Play Information to the User
+Input: None
+Output: None
+Preconditions: None
+Postconditions: None
 **/
 void howToPlay()
 {
@@ -188,7 +196,11 @@ void howToPlay()
 }
 
 /**
-
+Task: Display the High Score Table to the User
+Input: None
+Output: None
+Preconditions: A file "scores.dat" must exist and be formatted correctly
+Postconditions: None
 **/
 void viewHighScores()
 {
@@ -239,14 +251,20 @@ void viewHighScores()
 	} while (tolower(input) != 'c');
 }
 
-/*
-
-*/
+/**
+Task: Runs the Main Game Loop
+Input: None
+Output: None
+Preconditions: None
+Postconditions: None
+**/
 void playGame()
 {
+	//Declare Variables
 	double hoursRemaining = TOTAL_HOURS;
 	double money = STARTING_MONEY;
 	int totalGames = 0;
+	int customersServed = 0;
 	customerChoices custChoice;
 	Bin bins[TOTAL_BINS];
 
@@ -270,6 +288,7 @@ void playGame()
 		{
 			//Create a Customer
 			customer cust = createCustomer(gameList, totalGames);
+			customersServed++;
 
 			//Display Current Turn Info
 			displayTurnInfo(hoursRemaining, money, cust);
@@ -287,7 +306,7 @@ void playGame()
 					buyGame(bins, TOTAL_BINS, cust.buyGame, hoursRemaining, money);
 					break;
 				case NO_DEAL:
-					noDeal(cust.firstName, cust.lastName, hoursRemaining);
+					noDeal(bins, TOTAL_BINS, cust.firstName, cust.lastName, hoursRemaining);
 					break;
 			}
 		}
@@ -300,7 +319,7 @@ void playGame()
 	}
 
 	//Display Game Over Report
-	displayGameOverReport();
+	displayGameOverReport(customersServed, money);
 
 	//Check for High Score
 	updateHighScores(max(0.0, floor(money - STARTING_MONEY)));
@@ -309,9 +328,13 @@ void playGame()
 	viewHighScores();
 }
 
-/*
-
-*/
+/**
+Task: Reads in Information on Each of the Games from a File
+Input: totalEntries is an int variable to store the number of entries in the file
+Output: A pointer to the list of game structs
+Preconditions: totalEntries is an int pointer
+Postconditions: totalEntries contains the length of the gameList
+**/
 game* loadGameInformation(int &totalEntries)
 {
 	ifstream dataIn;
@@ -369,7 +392,11 @@ game* loadGameInformation(int &totalEntries)
 
 
 /**
-
+Task: Creates a new Customer struct
+Input: gameInfo is a pointer to the list of all games, totalGames is the size of that list
+Output: A customer struct
+Preconditions: gameInfo points to a game list, totalGames is the length of gameInfo
+Postconditions: customer has all fields initialized
 **/
 customer createCustomer(game* gameInfo, int totalGames)
 {
@@ -392,7 +419,11 @@ customer createCustomer(game* gameInfo, int totalGames)
 
 
 /**
-
+Task: Print Information About This Turn
+Input: hours is the number of hours that remain, money is the current money amount, and cust is the current customer
+Output: None
+Preconditions: hours is a double, money is a double, and cust is a customer
+Postconditions: None
 **/
 void displayTurnInfo(double hours, double money, customer cust)
 {
@@ -422,7 +453,11 @@ void displayTurnInfo(double hours, double money, customer cust)
 }
 
 /**
-
+Task: Converts the number of hours passed into the current time in hours and minutes
+Input: timeRemaining is the number of hours that remain, hour is the current hour, and minute is the current minute
+Output: None
+Preconditions: timeRemaining is a double, hour and minute are int pointers
+Postconditions: hour and minute have the correct time in hours and minutes
 **/
 void timeRemainingToTimeOfDay(double timeRemaining, int& hour, int& minute)
 {
@@ -436,7 +471,11 @@ void timeRemainingToTimeOfDay(double timeRemaining, int& hour, int& minute)
 
 
 /**
-
+Task: Prompts the user to make a choice on how to deal with a customer
+Input: bins is an array containing the game bins, s is the size of the bins array, and sellGame is the name of the game the customer wants to sell
+Output: the user's selection as a customerChoice enum
+Preconditions: bins[] is an array of type Bin, s is an int, sellGame is a string
+Postconditions: eChoice is of type customerChoice
 **/
 customerChoices makeCustomerChoice(Bin bins[], int s, string sellGame)
 {
@@ -482,7 +521,11 @@ customerChoices makeCustomerChoice(Bin bins[], int s, string sellGame)
 }
 
 /**
-
+Task: Checks if a game is in stock in the bins
+Input: bins is an array containing the game bins, s is the size of the bins array, and n is the name of the game to check for
+Output: a boolean value fo whether or not the game was found
+Preconditions: bins[] is an array of type Bin, s is an int, n is a string
+Postconditions: return value is a boolean
 **/
 bool gameInStock(Bin bins[], int s, string n)
 {
@@ -499,9 +542,13 @@ bool gameInStock(Bin bins[], int s, string n)
 	return false;
 }
 
-/*
-
-*/
+/**
+Task: Converts the enum type gameRarity to a string
+Input: the game rarity as an enum
+Output: the game rarity as a string
+Preconditions: rarity is of type gameRarity
+Postconditions: return value is a string
+**/
 string rarityText(gameRarity rarity)
 {
 	switch (rarity)
@@ -522,12 +569,17 @@ string rarityText(gameRarity rarity)
 }
 
 /**
-
+Task: Prompts the user to place the game the customer sold in one of the bins
+Input: bins is an array containing the game bins, s is the size of the bins array, g is a pointer to the game to place inside, remainingHours is a pointer to the time remaining, and money is a pointer to the current money
+Output: None
+Preconditions: bins is an array of type Bin, size is an int, g is a game pointer, remainingHours is a double pointer, money is a double pointer
+Postconditions: bins has been upated with the game, remainingHours with the new time, and money with the new profit
 **/
 void sellGame(Bin bins[], int size, game &g, double &remainingHours, double &money)
 {
-	bool gameInHand = true;
+	//Declare Variables
 	game* inHand = &g;
+	int binSelect;
 
 	cout << "Select the Bin in which to place " << g.name << ".\n";
 
@@ -535,42 +587,236 @@ void sellGame(Bin bins[], int size, game &g, double &remainingHours, double &mon
 	displayBins(bins, size);
 
 	//Prompt the User to Move Games Around
+	do
+	{
+		cout << "Place in bin #: ";
+		cin >> binSelect;
+		
+		//Input Validation
+		if (binSelect < 1 || binSelect > size)
+		{
+			cout << "Error: Please Select a Valid Bin Number (Bin Numbers Start at 1)\n";
+		}
+		else if (bins[binSelect - 1].isFull())
+		{
+			cout << "Selected Bin is Full. Please try another Bin\n";
+		}
 
-	//Add the Purchase Amount
-	money += g.storeBuyPrice;
+	} while (binSelect < 1 || binSelect > size || bins[binSelect - 1].isFull());
+
+	//Add the Game to the Bin
+	bins[binSelect - 1].pushGame(*inHand);
+
+	//Subtract the Purchase Amount
+	money -= g.storeBuyPrice;
+
+	//Decrease the Time Remaining
+	remainingHours -= 0.25;
+
+	//Ouput Result
+	cout << g.name << " was sold to you for $" << g.storeBuyPrice << ".\n";
 }
 
 /**
-
+Task: Prompts the User To Sort Bins to Find the Desired Game
+Input: bins is an array containing the game bins, s is the size of the bins array, g is a pointer to the game to place inside, remainingHours is a pointer to the time remaining, and money is a pointer to the current money
+Output: None
+Preconditions: bins is an array of type Bin, size is an int, g is a game pointer, remainingHours is a double pointer, money is a double pointer
+Postconditions: bins has been upated with the game, remainingHours with the new time, and money with the new profit
 **/
 void buyGame(Bin bins[], int size, game &g, double& remainingHours, double& money)
 {
+	//Declare Variables
 	bool gameInHand = false;
 	game* inHand = nullptr;
+	game* tempGame = nullptr;
+	int bin1Select;
+	int bin2Select;
 
-	cout << "Select " << g.name << " from the storage bins: ";
+	cout << "Select " << g.name << " from the storage bins: \n";
 
 	//Display the Bins
 	displayBins(bins, size);
 
 	//Prompt the User to Move Games Around
+	do
+	{
+		do
+		{
+			//Display the Menu Options
+			cout << "0) Place Top Game from Bin #1 in Hand\n";
 
-	//Subtract the Payment Amount
-	money -= g.storeBuyPrice;
+			for (int i = 1; i <= size; i++)
+			{
+				cout << i << ") Move Game from Top of Bin #" << i << "\n";
+			}
+			cout << "Make a Selection: ";
+			cin >> bin1Select;
+
+			//Input Validation
+			if (bin1Select < 0 || bin1Select > size)
+			{
+				cout << "Error: Please Select a Valid Bin Number (Bin Numbers Start at 1)\n";
+			}
+			else if (bin1Select != 0 && bins[bin1Select - 1].getCurrentSize() == 0)
+			{
+				cout << "Error: Please Select a Non-Empty Bin\n";
+			}
+			else if (bin1Select == 0 && bins[0].getTopGame()->name != g.name)
+			{
+				cout << "Error: This is not the customers desired game. Please place " << g.name << " in the first spot to proceed\n";
+			}
+
+		} while (bin1Select < 0 || bin1Select > size || (bin1Select != 0 && bins[bin1Select - 1].getCurrentSize() == 0) || (bin1Select == 0 && bins[0].getTopGame()->name != g.name));
+		
+
+		if (bin1Select == 0)
+		{
+			//Put the Game In Hand
+			inHand = bins[0].popGame();
+			gameInHand = true;
+		}
+		else
+		{
+			//Get the Game to Move
+			tempGame = bins[bin1Select - 1].popGame();
+
+			cout << "Popped Name: " << tempGame->name << endl;
+
+			//Get the Bin To Move To
+			do
+			{
+				//Display the Menu Options
+				cout << "Select a Bin to Place the Game: ";
+				cin >> bin2Select;
+
+				//Input Validation
+				if (bin2Select < 0 || bin2Select > size)
+				{
+					cout << "Error: Please Select a Valid Bin Number (Bin Numbers Start at 1)\n";
+				}
+				else if (bins[bin2Select - 1].isFull())
+				{
+					cout << "Error: The selected Bin is Full\n";
+				}
+
+			} while (bin2Select < 0 || bin2Select > size || bins[bin2Select - 1].isFull());
+
+			//Add the Game to the Bin
+			bins[bin2Select - 1].pushGame(*tempGame);
+
+			//Display the Action
+			cout << tempGame->name << " was moved from Bin #" << bin1Select << " to Bin #" << bin2Select << ".\n";
+		}
+
+		//Decrease the Time Remaining
+		remainingHours -= 0.25;
+
+	} while (!gameInHand);
+
+	//Add the Payment Amount
+	money += g.storeSellPrice;
+
+	//Ouput Result
+	cout << "You sold " << g.name << " for $" << g.storeSellPrice << ".\n";
 }
 
 /**
-
+Task: Turns the Customer Away and Offers a Chance to Sort Bins
+Input: bins is an array containing the game bins, size is the size of the bins array, firstName is the customer's first name, last name is the customer's last name, and remainingHours is a pointer to the time remaining
+Preconditions: bins is an array of type Bin, size is an int, firstName is a string, lastName is a string, remainingHours is a double pointer
+Postconditions: bins has been upated with the games, and remainingHours with the new time
 **/
-void noDeal(string firstName, string lastName, double &remainingHours)
+void noDeal(Bin bins[], int size, string firstName, string lastName, double &remainingHours)
 {
+	//Declare Variables
+	game* tempGame = nullptr;
+	int bin1Select;
+	int bin2Select;
+
+	//Display No Deal Message
 	cout << "You turned " << firstName << " " << lastName << " away.\n";
 
+	//Prompt the User to Sort the Bins
+	cout << "Sort Bins Until You Are Satisfied: ";
+
+	//Display the Bins
+	displayBins(bins, size);
+
+	//Prompt the User to Move Games Around
+	do
+	{
+		do
+		{
+			//Display the Menu Options
+			cout << "0) Finish Sorting\n";
+
+			for (int i = 1; i <= size; i++)
+			{
+				cout << i << ") Move Game from Top of Bin #" << i << "\n";
+			}
+			cout << "Make a Selection: ";
+			cin >> bin1Select;
+
+			//Input Validation
+			if (bin1Select < 0 || bin1Select > size)
+			{
+				cout << "Error: Please Select a Valid Bin Number (Bin Numbers Start at 1)\n";
+			}
+			else if (bin1Select != 0 && bins[bin1Select - 1].getCurrentSize() == 0)
+			{
+				cout << "Error: Please Select a Non-Empty Bin\n";
+			}
+
+		} while (bin1Select < 0 || bin1Select > size || (bin1Select != 0 && bins[bin1Select - 1].getCurrentSize() == 0));
+
+		
+		if (bin1Select != 0)
+		{
+			//Get the Game to Move
+			tempGame = bins[0].popGame();
+
+			//Get the Bin To Move To
+			do
+			{
+				//Display the Menu Options
+				cout << "Select a Bin to Place the Game\n";
+				cin >> bin2Select;
+
+				//Input Validation
+				if (bin2Select < 0 || bin2Select > size)
+				{
+					cout << "Error: Please Select a Valid Bin Number (Bin Numbers Start at 1)\n";
+				}
+				else if (bins[bin2Select - 1].isFull())
+				{
+					cout << "Error: The selected Bin is Full\n";
+				}
+
+			} while (bin2Select < 0 || bin2Select > size || bins[bin2Select - 1].isFull());
+
+			//Add the Game to the Bin
+			bins[bin2Select - 1].pushGame(*tempGame);
+
+			//Display the Action
+			cout << tempGame->name << " was moved from Bin #" << bin1Select << " to Bin #" << bin2Select << ".\n";
+
+			//Decrease the Time Remaining
+			remainingHours -= 0.25;
+		}
+
+	} while (bin1Select != 0);
+
+	//Decrease Time Remaining
 	remainingHours -= 0.5;
 }
 
 /**
-
+Task:
+Input:
+Output:
+Preconditions:
+Postconditions:
 **/
 void displayEndOfDayReport()
 {
@@ -578,15 +824,26 @@ void displayEndOfDayReport()
 }
 
 /**
-
+Task: Displays a Small Report with Playthrough Stats
+Input: customers is the number of customers served, money is the finishing amount of money
+Output: None
+Preconditions: customers is an int, money is a double
+Postconditions: None
 **/
-void displayGameOverReport()
+void displayGameOverReport(int customers, double money)
 {
-
+	cout << "*----* WEEK OVER *----*\n";
+	cout << "Total Customers Served: " << customers << "\n";
+	cout << "Total Profit Earned: $" << money - STARTING_MONEY << "\n";
+	cout << "\n\n";
 }
 
 /**
-
+Task:
+Input:
+Output:
+Preconditions:
+Postconditions:
 **/
 void updateHighScores(int score)
 {
@@ -595,7 +852,11 @@ void updateHighScores(int score)
 }
 
 /**
-
+Task:
+Input:
+Output:
+Preconditions:
+Postconditions:
 **/
 void displayBins(Bin bins[], int size)
 {
@@ -606,7 +867,7 @@ void displayBins(Bin bins[], int size)
 	}
 	cout << endl;
 
-	for (int i = 0; i < bins[0].getDepth(); i++)
+	for (int i = bins[0].getDepth() - 1; i >= 0; i--)
 	{
 		string game;
 
