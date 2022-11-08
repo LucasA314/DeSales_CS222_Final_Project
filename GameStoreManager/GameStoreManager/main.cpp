@@ -54,9 +54,9 @@ string rarityText(gameRarity);
 void sellGame(Bin[], int, game&, double&, double&);
 void buyGame(Bin[], int, game&, double&, double&);
 void noDeal(Bin[], int, string, string, double&);
-void displayEndOfDayReport(); //NEEDS TO BE WRITTEN
+void displayEndOfDayReport(int, double);
 void displayGameOverReport(int, double);
-void updateHighScores(int); //NEEDS TO BE WRITTEN
+void updateHighScores(int);
 void displayBins(Bin[], int);
 
 
@@ -265,6 +265,8 @@ void playGame()
 	double money = STARTING_MONEY;
 	int totalGames = 0;
 	int customersServed = 0;
+	int dailyCustomers = 0;
+	int dailyStartingMoney = STARTING_MONEY;
 	customerChoices custChoice;
 	Bin bins[TOTAL_BINS];
 
@@ -288,7 +290,7 @@ void playGame()
 		{
 			//Create a Customer
 			customer cust = createCustomer(gameList, totalGames);
-			customersServed++;
+			dailyCustomers++;
 
 			//Display Current Turn Info
 			displayTurnInfo(hoursRemaining, money, cust);
@@ -312,7 +314,9 @@ void playGame()
 		}
 
 		//Display the End of Day Report
-		displayEndOfDayReport();
+		displayEndOfDayReport(dailyCustomers, money - dailyStartingMoney);
+		customersServed += dailyCustomers;
+		dailyStartingMoney = money;
 
 		//Reset the Timer
 		hoursRemaining = TOTAL_HOURS;
@@ -477,7 +481,7 @@ Output: the user's selection as a customerChoice enum
 Preconditions: bins[] is an array of type Bin, s is an int, sellGame is a string
 Postconditions: eChoice is of type customerChoice
 **/
-customerChoices makeCustomerChoice(Bin bins[], int s, string sellGame)
+customerChoices makeCustomerChoice(Bin bins[], int s, string buyGame)
 {
 	int choice;
 	customerChoices eChoice;
@@ -496,12 +500,12 @@ customerChoices makeCustomerChoice(Bin bins[], int s, string sellGame)
 		{
 			std::cout << "\nInvalid Choice: Please enter a number 1 - 3.\n\n";
 		}
-		else if (choice == 2 && !gameInStock(bins, s, sellGame))
+		else if (choice == 2 && !gameInStock(bins, s, buyGame))
 		{
 			std::cout << "You do not have the customer's desired game in stock. Please make a different selection.\n\n";
 		}
 
-	} while (choice != 1 && choice != 2 && choice != 3);
+	} while ((choice != 1 && choice != 2 && choice != 3) || (choice == 2 && !gameInStock(bins, s, buyGame)));
 
 	//Convert to Enum Type
 	switch (choice)
@@ -628,19 +632,19 @@ void buyGame(Bin bins[], int size, game &g, double& remainingHours, double& mone
 {
 	//Declare Variables
 	bool gameInHand = false;
-	game* inHand = nullptr;
-	game* tempGame = nullptr;
+	game inHand;
+	game tempGame;
 	int bin1Select;
 	int bin2Select;
 
 	cout << "Select " << g.name << " from the storage bins: \n";
 
-	//Display the Bins
-	displayBins(bins, size);
-
 	//Prompt the User to Move Games Around
 	do
 	{
+		//Display the Bins
+		displayBins(bins, size);
+
 		do
 		{
 			//Display the Menu Options
@@ -681,8 +685,6 @@ void buyGame(Bin bins[], int size, game &g, double& remainingHours, double& mone
 			//Get the Game to Move
 			tempGame = bins[bin1Select - 1].popGame();
 
-			cout << "Popped Name: " << tempGame->name << endl;
-
 			//Get the Bin To Move To
 			do
 			{
@@ -703,10 +705,10 @@ void buyGame(Bin bins[], int size, game &g, double& remainingHours, double& mone
 			} while (bin2Select < 0 || bin2Select > size || bins[bin2Select - 1].isFull());
 
 			//Add the Game to the Bin
-			bins[bin2Select - 1].pushGame(*tempGame);
+			bins[bin2Select - 1].pushGame(tempGame);
 
 			//Display the Action
-			cout << tempGame->name << " was moved from Bin #" << bin1Select << " to Bin #" << bin2Select << ".\n";
+			cout << tempGame.name << " was moved from Bin #" << bin1Select << " to Bin #" << bin2Select << ".\n";
 		}
 
 		//Decrease the Time Remaining
@@ -730,7 +732,7 @@ Postconditions: bins has been upated with the games, and remainingHours with the
 void noDeal(Bin bins[], int size, string firstName, string lastName, double &remainingHours)
 {
 	//Declare Variables
-	game* tempGame = nullptr;
+	game tempGame;
 	int bin1Select;
 	int bin2Select;
 
@@ -738,7 +740,7 @@ void noDeal(Bin bins[], int size, string firstName, string lastName, double &rem
 	cout << "You turned " << firstName << " " << lastName << " away.\n";
 
 	//Prompt the User to Sort the Bins
-	cout << "Sort Bins Until You Are Satisfied: ";
+	cout << "Sort Bins Until You Are Satisfied:\n";
 
 	//Display the Bins
 	displayBins(bins, size);
@@ -796,10 +798,10 @@ void noDeal(Bin bins[], int size, string firstName, string lastName, double &rem
 			} while (bin2Select < 0 || bin2Select > size || bins[bin2Select - 1].isFull());
 
 			//Add the Game to the Bin
-			bins[bin2Select - 1].pushGame(*tempGame);
+			bins[bin2Select - 1].pushGame(tempGame);
 
 			//Display the Action
-			cout << tempGame->name << " was moved from Bin #" << bin1Select << " to Bin #" << bin2Select << ".\n";
+			cout << tempGame.name << " was moved from Bin #" << bin1Select << " to Bin #" << bin2Select << ".\n\n";
 
 			//Decrease the Time Remaining
 			remainingHours -= 0.25;
@@ -812,15 +814,18 @@ void noDeal(Bin bins[], int size, string firstName, string lastName, double &rem
 }
 
 /**
-Task:
-Input:
-Output:
-Preconditions:
-Postconditions:
+Task: Displays a Small Report with Daily Stats
+Input: customers is the number of customers served, money is the finishing amount of money
+Output: None
+Preconditions: customers is an int, money is a double
+Postconditions: None
 **/
-void displayEndOfDayReport()
+void displayEndOfDayReport(int customers, double money)
 {
-
+	cout << "*----* DAY OVER *----*\n";
+	cout << "Daily Customers Served: " << customers << "\n";
+	cout << "Daily Profit Earned: $" << money << "\n";
+	cout << "\n\n";
 }
 
 /**
@@ -839,24 +844,107 @@ void displayGameOverReport(int customers, double money)
 }
 
 /**
-Task:
-Input:
-Output:
-Preconditions:
-Postconditions:
+Task: Checks if the player's score is a new high score and updates the table accordingly
+Input: newScore is the new high score to compare with the current scores
+Output: None
+Preconditions: newScore is an int
+Postconditions: The scores.dat file has updated high scores
 **/
-void updateHighScores(int score)
+void updateHighScores(int newScore)
 {
+	ifstream scoresIn;
+	ofstream scoresOut;
+	string names[MAX_HIGH_SCORES];
+	string newNames[MAX_HIGH_SCORES];
+	int scores[MAX_HIGH_SCORES];
+	int newScores[MAX_HIGH_SCORES];
+	int scorePos = -1;
+	string newName;
+	char input;
 
+	//Read in High Scores
+	scoresIn.open("scores.dat");
+
+	for (int i = 0; i < MAX_HIGH_SCORES; i++)
+	{
+		string name;
+		int score;
+
+		//Check for Blank Scores
+		if (scoresIn >> name)
+		{
+			scoresIn >> score;
+
+			names[i] = name;
+			scores[i] = score;
+		}
+		else
+		{
+			names[i] = "";
+			scores[i] = -1;
+		}
+
+		//Check for A New High Score
+		if (scorePos == -1 && newScore > scores[i])
+		{
+			scorePos = i;
+		}
+	}
+
+	scoresIn.close();
+
+	//Get Player Name if New High Score
+	if (scorePos != -1)
+	{
+		cout << "NEW HIGH SCORE!!!!\nPlease Enter Your Name: ";
+		cin >> newName;
+
+		//Create Abbreviation
+		newName = newName.substr(0, 4);
+
+		//Update the High Scores List
+		for (int i = 0; i < MAX_HIGH_SCORES; i++)
+		{
+			if (i < scorePos)
+			{
+				newNames[i] = names[i];
+				newScores[i] = scores[i];
+			}
+			else if (i == scorePos)
+			{
+				newNames[i] = newName;
+				newScores[i] = newScore;
+			}
+			else
+			{
+				newNames[i] = names[i - 1];
+				newScores[i] = scores[i - 1];
+			}
+		}
+
+		//Write the New High Scores
+		scoresOut.open("scores.dat");
+
+		for (int i = 0; i < MAX_HIGH_SCORES; i++)
+		{
+			if (newScores[i] > 0)
+			{
+				scoresOut << newNames[i] << endl;
+				scoresOut << newScores[i] << endl;
+			}
+		}
+
+		scoresOut.close();
+	}
 
 }
 
 /**
-Task:
-Input:
-Output:
-Preconditions:
-Postconditions:
+Task: Displays the Games in Each Bin
+Input: bins is the list of game bins, size is the size of the bins list
+Output: None
+Preconditions: bins is an array of type Bin, size is of type int
+Postconditions: None
 **/
 void displayBins(Bin bins[], int size)
 {

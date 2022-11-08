@@ -87,15 +87,20 @@ void Bin::pushGame(game newGame)
 }
 
 
-game* Bin::popGame()
+game Bin::popGame()
 {
 	int index = binStack.top();
-	game newGame = binContents[index];
+	game newGame = game();
+
+	newGame.name = binContents[index].name;
+	newGame.rarity = binContents[index].rarity;
+	newGame.storeBuyPrice = binContents[index].storeBuyPrice;
+	newGame.storeSellPrice = binContents[index].storeSellPrice;
 
 	binStack.pop();
 	binContents[index] = game();
 
 	currentSize--;
 
-	return &newGame;
+	return newGame;
 }

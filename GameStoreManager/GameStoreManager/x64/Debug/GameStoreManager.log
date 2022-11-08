@@ -1,11 +1,17 @@
-﻿  main.cpp
+﻿  bin.cpp
+  main.cpp
 C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(69,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(325,22): warning C4244: 'argument': conversion from 'const _Ty' to 'int', possible loss of data
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(269,25): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(319,24): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(329,22): warning C4244: 'argument': conversion from 'const _Ty' to 'int', possible loss of data
           with
           [
               _Ty=double
           ]
-C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(404,6): warning C4101: 'randInt': unreferenced local variable
-C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(468,20): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(569): warning C4715: 'rarityText': not all control paths return a value
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(408,6): warning C4101: 'randInt': unreferenced local variable
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(472,20): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(863,7): warning C4101: 'input': unreferenced local variable
+  Generating Code...
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\main.cpp(573): warning C4715: 'rarityText': not all control paths return a value
+C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\GameStoreManager\bin.cpp(64): warning C4715: 'Bin::getGame': not all control paths return a value
   GameStoreManager.vcxproj -> C:\Users\lucas\OneDrive\Documents\Programming\GitHubRepos\DeSales_CS222_Final_Project\GameStoreManager\x64\Debug\GameStoreManager.exe

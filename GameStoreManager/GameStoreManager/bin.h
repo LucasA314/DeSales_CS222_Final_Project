@@ -46,7 +46,7 @@ class Bin
 		game* getTopGame();
 		
 		void pushGame(game);
-		game* popGame();
+		game popGame();
 
 };
 
