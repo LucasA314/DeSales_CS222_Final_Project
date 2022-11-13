@@ -296,7 +296,7 @@ void playGame()
 			displayTurnInfo(hoursRemaining, money, cust);
 
 			//Make a Choice
-			custChoice = makeCustomerChoice(bins, TOTAL_BINS, cust.sellGame.name);
+			custChoice = makeCustomerChoice(bins, TOTAL_BINS, cust.buyGame.name);
 
 			//Take the Action
 			switch (custChoice)
@@ -317,6 +317,7 @@ void playGame()
 		displayEndOfDayReport(dailyCustomers, money - dailyStartingMoney);
 		customersServed += dailyCustomers;
 		dailyStartingMoney = money;
+		dailyCustomers = 0;
 
 		//Reset the Timer
 		hoursRemaining = TOTAL_HOURS;
@@ -502,7 +503,7 @@ customerChoices makeCustomerChoice(Bin bins[], int s, string buyGame)
 		}
 		else if (choice == 2 && !gameInStock(bins, s, buyGame))
 		{
-			std::cout << "You do not have the customer's desired game in stock. Please make a different selection.\n\n";
+			std::cout << "You do not have the customer's desired game (" << buyGame << ") in stock.Please make a different selection.\n\n";
 		}
 
 	} while ((choice != 1 && choice != 2 && choice != 3) || (choice == 2 && !gameInStock(bins, s, buyGame)));
