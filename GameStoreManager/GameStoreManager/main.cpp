@@ -91,6 +91,8 @@ int main()
 			case VIEW_HIGH_SCORES:
 				viewHighScores();
 				break;
+			case QUIT:
+				break;
 		}
 
 	} while (menuChoice != QUIT);
@@ -406,7 +408,7 @@ Postconditions: customer has all fields initialized
 customer createCustomer(game* gameInfo, int totalGames)
 {
 	customer cust;
-	int randInt;
+	//int randInt;
 
 	//Set First Names
 	string firstNames[] = {"Todd", "Angela", "Priscilla", "Luke", "Carl", "Caitlin"};
@@ -556,21 +558,23 @@ Postconditions: return value is a string
 **/
 string rarityText(gameRarity rarity)
 {
+	string rare;
 	switch (rarity)
 	{
 		case COMMON:
-			return "Common";
+			rare = "Common";
 			break;
 		case UNCOMMON:
-			return "Uncommon";
+			rare = "Uncommon";
 			break;
 		case SEMI_RARE:
-			return "Semi-Rare";
+			rare = "Semi-Rare";
 			break;
 		case RARE:
-			return "Rare";
+			rare = "Rare";
 			break;
 	}
+	return rare;
 }
 
 /**
@@ -861,7 +865,7 @@ void updateHighScores(int newScore)
 	int newScores[MAX_HIGH_SCORES];
 	int scorePos = -1;
 	string newName;
-	char input;
+	//char input;
 
 	//Read in High Scores
 	scoresIn.open("scores.dat");

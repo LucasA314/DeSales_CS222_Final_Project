@@ -61,6 +61,7 @@ game* Bin::getGame(string n)
 			return &binContents[i];
 		}
 	}
+	return &binContents[0];
 }
 
 
